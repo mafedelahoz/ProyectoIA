@@ -57,6 +57,7 @@ testSplit = 0.2
 
 random.shuffle(image_files)
 imgTrainList = image_files[:int(dataSize*trainSplit)]
+print(imgTrainList,len(imgTrainList))
 imgValList = image_files[int(dataSize*trainSplit):int(dataSize*(trainSplit+valSplit))]
 imgTestList = image_files[int(dataSize*(trainSplit+valSplit)):]
 
@@ -65,7 +66,6 @@ labelTrainList= label_files[:int(dataSize*trainSplit)]
 labelValList= label_files[int(dataSize*trainSplit):int(dataSize*(trainSplit+valSplit))]
 labelTestList= label_files[int(dataSize*(trainSplit+valSplit)):]
 
-#print(len(labelTrainList),len(labelValList),len(labelTestList))
 def_size = 300
 space = ' '
 new_line = '\n'
@@ -113,8 +113,4 @@ def change_extension(file):
     return filename
 
 move_files(labelTrainList, label_path, label_train_path)
-move_files(labelValList, label_path, label_val_path)
-move_files(labelTestList, label_path, label_test_path)
 move_images(imgTrainList, img_path, img_train_path)
-move_images(imgValList, img_path, img_val_path)
-move_images(imgTestList, img_path, img_test_path)
