@@ -136,6 +136,7 @@ def change_extension(file):
     filename=basename+text
     return filename
 
+#Invocación de las funciones de mover archivos e imágenes
 """"
 move_files(labelTrainList, label_path, label_train_path)
 move_files(labelValList, label_path, label_val_path)
@@ -146,8 +147,6 @@ move_images(imgTestList, img_path, img_test_path)
 """""
 
 #Parte 2
-
-
 
 # Generar líneas de configuración
 ln_1 = '# Train/val/test sets' + new_line
@@ -166,7 +165,7 @@ config_path=os.path.join(curr_path, 'config.yaml')
 config_path
 green = (0,255,0)
 
-
+#Función para obtener las bounding boxes de las etiquetas
 def get_bbox_from_label(text_file_path):
     bbox_list=[]
     print(text_file_path)
@@ -186,22 +185,45 @@ def get_bbox_from_label(text_file_path):
 
     return tuple(bbox_list)
 
-plt.figure(figsize=(30,30))
-for i in range(1,8,2):
-    k = random.randint(0, len(imgTrainList)-1)
+# Asumiendo que get_bbox_from_label y otras configuraciones están ya definidas
+plt.figure(figsize=(30, 30))
+
+for i in range(1, 8, 2):  # Crea un bucle para mostrar varias imágenes
+    k = random.randint(0, len(imgTrainList) - 1)
     img_path = os.path.join(img_train_path, imgTrainList[k])
     label_path = os.path.join(label_train_path, labelTrainList[k])
-    print(img_train_path,label_train_path)
-    bbox = get_bbox_from_label(label_path)
+
+    # Verificar si el archivo de imagen y etiqueta existen
+    if not os.path.exists(img_path):
+        print(f"El archivo de imagen no existe: {img_path}")
+        continue  # Pasar a la siguiente iteración del bucle si la imagen no existe
+    if not os.path.exists(label_path):
+        print(f"El archivo de etiqueta no existe: {label_path}")
+        continue  # Pasar a la siguiente iteración del bucle si la etiqueta no existe
+
     img = cv2.imread(img_path)
+    if img is None:
+        print(f"No se pudo cargar la imagen: {img_path}")
+        continue  # Pasar a la siguiente iteración del bucle si la imagen no se pudo cargar
+
+    bbox = get_bbox_from_label(label_path)
     copy_img = copy.deepcopy(img)
-    ax=plt.subplot(4, 2, i)
-    plt.imshow(img) # displaying image
+
+    # Configura el subplot para la imagen original
+    ax = plt.subplot(4, 2, i)
+    plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))  # Mostrar la imagen convertida a RGB
     plt.xticks([])
     plt.yticks([])
-    cv2.drawContours(copy_img, bbox, -1, green, 2)
-    ax=plt.subplot(4, 2, i+1)
-    plt.imshow(copy_img) # displaying image with bounding box
+
+    # Dibujar los contornos de las bounding boxes
+    for box in bbox:
+        cv2.drawContours(copy_img, [box], -1, (0, 255, 0), 2)  # Dibuja en verde
+
+    # Configura el subplot para la imagen con bounding boxes
+    ax = plt.subplot(4, 2, i + 1)
+    plt.imshow(cv2.cvtColor(copy_img, cv2.COLOR_BGR2RGB))  # Mostrar la imagen convertida a RGB con bounding boxes
     plt.xticks([])
     plt.yticks([])
-    
+
+plt.show()  # Muestra todas las imágenes tras configurar los subplots
+
