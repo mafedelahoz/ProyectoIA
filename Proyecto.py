@@ -171,10 +171,10 @@ config_path=os.path.join(curr_path, 'config.yaml')
         file.write(line)
 
 print(f'Archivo de configuración creado en: {config_path}')"""
-
+"""""
 green = (0,255,0)
 
-"""""
+
 #Función para obtener las bounding boxes de las etiquetas
 def get_bbox_from_label(text_file_path):
     bbox_list=[]
@@ -244,6 +244,8 @@ model=YOLO('yolov8n.yaml').load('yolov8n.pt')
 
 # Entrenar el modelo
 #results=model.train(data=config_path, epochs=10, resume=True, iou=0.5, conf=0.001)
+
+"""""
 plt.figure(figsize=(30,30))
 trainingresult_path=os.path.join(curr_path, 'runs', 'detect', 'train2')
 results_png=cv2.imread(os.path.join(trainingresult_path,'results.png'))
@@ -284,6 +286,7 @@ def display_curves(root_path):
     confusion_matrix=cv2.imread(os.path.join(root_path,'confusion_matrix.png'))
     ax=plt.subplot(5,1,5)
     plt.imshow(confusion_matrix)
+"""
 
 # Evaluar métricas de entrenamiento
 #train_metrics, train_map50=evaluate_map50(model, config_path, dataset='train')
@@ -299,26 +302,26 @@ def display_curves(root_path):
 #Parte 4--------------------------------------------------------------------------------
 #Visualización de los resultados del modelo
 
-model2 = YOLO(curr_path+'/runs/detect/train2/weights/best.pt')  # load a custom model
+model2 = YOLO(curr_path+'/runs/detect/train2/weights/best.pt')  #Cargar modelo entrenado
 plt.figure(figsize=(30,30))
-m=random.randint(0, 500) # Selecting random image number
+m=random.randint(0, 500) # Seleccionar una imagen aleatoria
 for i in range(1,8,2):
     m=random.randint(0, 500)
     test_image=os.path.join(img_train_path, os.listdir(img_train_path)[m])
     ax=plt.subplot(4,2,i)
 
-    # Display actual image
+    # Desplegar imagen real
     plt.imshow(cv2.imread(test_image))
     plt.xticks([])
     plt.yticks([])
     plt.title("Actual image", fontsize = 40)
 
-    # Predict
+    # Prediccion de la imagen
     res = model(test_image)
     res_plotted = res[0].plot()
     ax=plt.subplot(4,2,i+1)
 
-    # Display image with predictions
+    # Desplegar imagen con predicciones
     plt.imshow(res_plotted)
     plt.title("Image with predictions", fontsize = 40)
     plt.xticks([])
