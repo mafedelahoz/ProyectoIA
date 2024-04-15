@@ -1,0 +1,8 @@
+# Train/val/test sets
+train: 'C:\Users\Mafe\ProyectoIA\images\train'
+val: 'C:\Users\Mafe\ProyectoIA\images\val'
+test: 'C:\Users\Mafe\ProyectoIA\images\test'
+
+# Classes
+nc: 5
+names: ['Vehiculos', 'Construcciones', 'Vias', 'Rios', 'Mineria']

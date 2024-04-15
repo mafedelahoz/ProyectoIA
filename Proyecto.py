@@ -27,8 +27,10 @@ import cv2
 import xml.etree.ElementTree as ET
 from PIL import Image
 import glob
+from ultralytics import YOLO
 
-#Parte 1
+#Parte 1----------------------------------------------------------------------------------
+
 """Creación de los directorios de las imágenes y las etiquetas-Desplazamiento de los datos"""
 #Path de los datasets
 curr_path = os.getcwd()
@@ -146,7 +148,7 @@ move_images(imgValList, img_path, img_val_path)
 move_images(imgTestList, img_path, img_test_path)
 """""
 
-#Parte 2
+#Parte 2--------------------------------------------------------------------------------
 
 # Generar líneas de configuración
 ln_1 = '# Train/val/test sets' + new_line
@@ -162,9 +164,17 @@ config_lines = [ln_1, ln_2, ln_3, ln_4, ln_5, ln_6, ln_7, ln_8]
 
 #Creación del archivo config.yaml
 config_path=os.path.join(curr_path, 'config.yaml')
-config_path
+
+# Abrir el archivo en modo de escritura ('w') para crearlo si no existe o sobrescribirlo si ya existe
+"""with open(config_path, 'w') as file:
+    for line in config_lines:
+        file.write(line)
+
+print(f'Archivo de configuración creado en: {config_path}')"""
+
 green = (0,255,0)
 
+"""""
 #Función para obtener las bounding boxes de las etiquetas
 def get_bbox_from_label(text_file_path):
     bbox_list=[]
@@ -226,4 +236,92 @@ for i in range(1, 8, 2):  # Crea un bucle para mostrar varias imágenes
     plt.yticks([])
 
 plt.show()  # Muestra todas las imágenes tras configurar los subplots
+"""
+#Parte 3--------------------------------------------------------------------------------
+#Uso del modelo preentrenado de YOLO para el entrenamiento
 
+model=YOLO('yolov8n.yaml').load('yolov8n.pt')
+
+# Entrenar el modelo
+#results=model.train(data=config_path, epochs=10, resume=True, iou=0.5, conf=0.001)
+plt.figure(figsize=(30,30))
+trainingresult_path=os.path.join(curr_path, 'runs', 'detect', 'train2')
+results_png=cv2.imread(os.path.join(trainingresult_path,'results.png'))
+plt.imshow(results_png)
+
+#Función para obtener las métricas del modelo
+def evaluate_map50(trainedmodel, data_path, dataset='val'):
+    metrics=trainedmodel.val(data=data_path, split=dataset)
+    map50=round(metrics.box.map50, 3)
+    print("The mAP of model on {0} dataset is {1}".format(dataset,map50))
+    return metrics, map50
+
+#Función para mostrar las curvas de precisión y recall
+def display_curves(root_path):
+    plt.figure(figsize=(50,50))
+
+    #desplegar curva p
+    p_curve=cv2.imread(os.path.join(root_path,'P_curve.png'))
+    ax=plt.subplot(5,1,1)
+    plt.imshow(p_curve)
+
+    #desplegar curva r
+    r_curve=cv2.imread(os.path.join(root_path,'R_curve.png'))
+    ax=plt.subplot(5,1,2)
+    plt.imshow(r_curve)
+
+    #desplegar curva pr
+    pr_curve=cv2.imread(os.path.join(root_path,'PR_curve.png'))
+    ax=plt.subplot(5,1,3)
+    plt.imshow(pr_curve)
+
+    #desplegar curva f1
+    f1_curve=cv2.imread(os.path.join(root_path,'F1_curve.png'))
+    ax=plt.subplot(5,1,4)
+    plt.imshow(f1_curve)
+
+    #desplegar matriz de confusión
+    confusion_matrix=cv2.imread(os.path.join(root_path,'confusion_matrix.png'))
+    ax=plt.subplot(5,1,5)
+    plt.imshow(confusion_matrix)
+
+# Evaluar métricas de entrenamiento
+#train_metrics, train_map50=evaluate_map50(model, config_path, dataset='train')
+
+# Evaluar métricas de validación	
+#val_metrics, val_map50=evaluate_map50(model, config_path, dataset='val')
+#val_path=os.path.join(curr_path, 'runs', 'detect', 'train2')
+#display_curves(val_path)
+
+# Evaluar métricas de prueba
+#test_metrics, test_map50=evaluate_map50(model, config_path, dataset='test')
+
+#Parte 4--------------------------------------------------------------------------------
+#Visualización de los resultados del modelo
+
+model2 = YOLO(curr_path+'/runs/detect/train2/weights/best.pt')  # load a custom model
+plt.figure(figsize=(30,30))
+m=random.randint(0, 500) # Selecting random image number
+for i in range(1,8,2):
+    m=random.randint(0, 500)
+    test_image=os.path.join(img_train_path, os.listdir(img_train_path)[m])
+    ax=plt.subplot(4,2,i)
+
+    # Display actual image
+    plt.imshow(cv2.imread(test_image))
+    plt.xticks([])
+    plt.yticks([])
+    plt.title("Actual image", fontsize = 40)
+
+    # Predict
+    res = model(test_image)
+    res_plotted = res[0].plot()
+    ax=plt.subplot(4,2,i+1)
+
+    # Display image with predictions
+    plt.imshow(res_plotted)
+    plt.title("Image with predictions", fontsize = 40)
+    plt.xticks([])
+    plt.yticks([])
+    # m=m+1
+    plt.show()
