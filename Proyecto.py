@@ -243,11 +243,11 @@ plt.show()  # Muestra todas las imágenes tras configurar los subplots
 model=YOLO('yolov8n.yaml').load('yolov8n.pt')
 
 # Entrenar el modelo
-#results=model.train(data=config_path, epochs=10, resume=True, iou=0.5, conf=0.001)
+#results=model.train(data=config_path, epochs=15, resume=True, iou=0.3, conf=0.001)
 
-"""""
+""""
 plt.figure(figsize=(30,30))
-trainingresult_path=os.path.join(curr_path, 'runs', 'detect', 'train2')
+trainingresult_path=os.path.join(curr_path, 'runs', 'detect', 'train3')
 results_png=cv2.imread(os.path.join(trainingresult_path,'results.png'))
 plt.imshow(results_png)
 
@@ -286,25 +286,27 @@ def display_curves(root_path):
     confusion_matrix=cv2.imread(os.path.join(root_path,'confusion_matrix.png'))
     ax=plt.subplot(5,1,5)
     plt.imshow(confusion_matrix)
-"""
+
 
 # Evaluar métricas de entrenamiento
-#train_metrics, train_map50=evaluate_map50(model, config_path, dataset='train')
+train_metrics, train_map50=evaluate_map50(model, config_path, dataset='train')
 
 # Evaluar métricas de validación	
-#val_metrics, val_map50=evaluate_map50(model, config_path, dataset='val')
-#val_path=os.path.join(curr_path, 'runs', 'detect', 'train2')
-#display_curves(val_path)
+val_metrics, val_map50=evaluate_map50(model, config_path, dataset='val')
+val_path=os.path.join(curr_path, 'runs', 'detect', 'train3')
+display_curves(val_path)
 
 # Evaluar métricas de prueba
-#test_metrics, test_map50=evaluate_map50(model, config_path, dataset='test')
+test_metrics, test_map50=evaluate_map50(model, config_path, dataset='test')
 
 #Parte 4--------------------------------------------------------------------------------
 #Visualización de los resultados del modelo
 
-model2 = YOLO(curr_path+'/runs/detect/train2/weights/best.pt')  #Cargar modelo entrenado
+"""
+
+model2 = YOLO(curr_path+'/runs/detect/train3/weights/best.pt')  #Cargar modelo entrenado
 plt.figure(figsize=(30,30))
-m=random.randint(0, 500) # Seleccionar una imagen aleatoria
+m=random.randint(0, 600) # Seleccionar una imagen aleatoria
 for i in range(1,8,2):
     m=random.randint(0, 500)
     test_image=os.path.join(img_train_path, os.listdir(img_train_path)[m])
@@ -317,7 +319,7 @@ for i in range(1,8,2):
     plt.title("Actual image", fontsize = 40)
 
     # Prediccion de la imagen
-    res = model(test_image)
+    res = model2(test_image)
     res_plotted = res[0].plot()
     ax=plt.subplot(4,2,i+1)
 
@@ -328,3 +330,4 @@ for i in range(1,8,2):
     plt.yticks([])
     # m=m+1
     plt.show()
+   
