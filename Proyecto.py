@@ -304,30 +304,30 @@ test_metrics, test_map50=evaluate_map50(model, config_path, dataset='test')
 
 """
 
-model2 = YOLO(curr_path+'/runs/detect/train3/weights/best.pt')  #Cargar modelo entrenado
-plt.figure(figsize=(30,30))
-m=random.randint(0, 600) # Seleccionar una imagen aleatoria
-for i in range(1,8,2):
-    m=random.randint(0, 500)
-    test_image=os.path.join(img_train_path, os.listdir(img_train_path)[m])
-    ax=plt.subplot(4,2,i)
+model2 = YOLO(curr_path+'/runs/detect/train2/weights/best.pt')  #Cargar modelo entrenado
 
-    # Desplegar imagen real
-    plt.imshow(cv2.imread(test_image))
+for i in range(1, 8, 2):
+    plt.figure(figsize=(10, 10))  # Definir tamaño consistentemente
+
+    m = random.randint(0, 500)
+    test_image = os.path.join(img_train_path, os.listdir(img_train_path)[m])
+
+    
+    ax = plt.subplot(1, 2, 1)  
+    img = cv2.imread(test_image)
+    plt.imshow(img)
+    plt.title("Actual image", fontsize=15)
     plt.xticks([])
     plt.yticks([])
-    plt.title("Actual image", fontsize = 40)
 
-    # Prediccion de la imagen
+    # Predicción de la imagen
     res = model2(test_image)
     res_plotted = res[0].plot()
-    ax=plt.subplot(4,2,i+1)
-
-    # Desplegar imagen con predicciones
+    plt.subplot(1, 2, 2)  
     plt.imshow(res_plotted)
-    plt.title("Image with predictions", fontsize = 40)
+    plt.title("Image with predictions", fontsize=15)
     plt.xticks([])
     plt.yticks([])
-    # m=m+1
-    plt.show()
-   
+
+    plt.show()  
+    plt.close()  
