@@ -21,7 +21,7 @@ label_path = curr_path+'/labels'
   
 
 results_list = []
-model2 = YOLO(curr_path+'/runs/detect/train2/weights/best.pt')  #Cargar modelo entrenado
+model2 = YOLO(curr_path+'/runs/detect/train4/weights/best.pt')  #Cargar modelo entrenado
 
 
 
@@ -78,40 +78,36 @@ print(top_50_secciones)
 # Seleccionar los 5 rangos con más detecciones
 top_5_secciones = top_50_secciones.head(5)
 
+# Mostrar imágenes y predicciones del top 5
+
 for index, row in top_5_secciones.iterrows():
     start_image = row['Start Image']
-    # Extraer el índice numérico del nombre de la imagen y preparar para buscar 3 imágenes válidas
-    start_index = int(start_image.split('_')[-1].split('.')[0])
-
-    fig, axes =  plt.subplots(1, 6, figsize=(30, 5)) 
+    start_index = df[df['Image Name'] == start_image].index[0]
+    
+    fig, axes = plt.subplots(1, 6, figsize=(30, 5))
     
     found_images = 0
-    j = 0
-
     while found_images < 3:
-        current_image_name = f"video_13min_{str(start_index + j).zfill(3)}.jpg"
-        j += 1
+        img_name = df.iloc[start_index + found_images]['Image Name']
+        img_path = os.path.join(img_train_path, img_name)
         
-        if current_image_name in available_images:
-            img_path = os.path.join(img_train_path, current_image_name)
-            img = cv2.imread(img_path)
-            if img is not None:
-                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                # Colocar cada imagen y predicción de forma consecutiva
-                axes[found_images * 2].imshow(img)
-                axes[found_images * 2].set_title(f"Image: {current_image_name}", fontsize=12)
-                axes[found_images * 2].axis('off')
-
-                res = model2(img_path)
-                res_plotted = res[0].plot()
-                axes[found_images * 2 + 1].imshow(res_plotted)
-                axes[found_images * 2 + 1].set_title(f"Predictions on {current_image_name}", fontsize=12)
-                axes[found_images * 2 + 1].axis('off')
-                
-                found_images += 1
-        
-        if j > 15:  # Prevenir un bucle infinito
-            break
-
+        img = cv2.imread(img_path)
+        if img is not None:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            
+            # Colocar la imagen original
+            axes[found_images * 2].imshow(img)
+            axes[found_images * 2].set_title(f"Image: {img_name}", fontsize=12)
+            axes[found_images * 2].axis('off')
+            
+            # Realizar las predicciones y colocarlas
+            res = model2(img_path)
+            res_plotted = res[0].plot()
+            axes[found_images * 2 + 1].imshow(res_plotted)
+            axes[found_images * 2 + 1].set_title(f"Predictions on {img_name}", fontsize=12)
+            axes[found_images * 2 + 1].axis('off')
+            
+            found_images += 1
+    
     plt.tight_layout()
     plt.show()
