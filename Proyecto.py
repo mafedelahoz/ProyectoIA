@@ -246,7 +246,7 @@ model=YOLO('yolov8n.yaml').load('yolov8n.pt')
 
 """"
 plt.figure(figsize=(30,30))
-trainingresult_path=os.path.join(curr_path, 'runs', 'detect', 'train3')
+trainingresult_path=os.path.join(curr_path, 'runs', 'detect', 'train4')
 results_png=cv2.imread(os.path.join(trainingresult_path,'results.png'))
 plt.imshow(results_png)
 
@@ -303,7 +303,7 @@ test_metrics, test_map50=evaluate_map50(model, config_path, dataset='test')
 
 """
 
-model2 = YOLO(curr_path+'/runs/detect/train2/weights/best.pt')  #Cargar modelo entrenado
+model2 = YOLO(curr_path+'/runs/detect/train4/weights/best.pt')  #Cargar modelo entrenado
 
 for i in range(1, 8, 2):
     plt.figure(figsize=(10, 10))  # Definir tamaño consistentemente
